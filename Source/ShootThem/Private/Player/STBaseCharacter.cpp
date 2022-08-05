@@ -46,6 +46,11 @@ void ASTBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
         PlayerInputComponent->BindAxis("LookUp", this, &ASTBaseCharacter::AddControllerPitchInput);
         PlayerInputComponent->BindAxis("TurnAround", this, &ASTBaseCharacter::AddControllerYawInput);
         PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASTBaseCharacter::Jump);
+
+        PlayerInputComponent->BindAction("Run", IE_Pressed, this, &ASTBaseCharacter::OnStartRunning);
+        PlayerInputComponent->BindAction("Run", IE_Released, this, &ASTBaseCharacter::OnStopRunning);
+
+ 
     }
 
 
@@ -53,6 +58,7 @@ void ASTBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void ASTBaseCharacter::MoveForward(float Amount)
 {
+    IsMovingForward = Amount > 0.0f;
     AddMovementInput(GetActorForwardVector(), Amount);
 }
 
@@ -60,3 +66,21 @@ void ASTBaseCharacter::MoveRight(float Amount)
 {
     AddMovementInput(GetActorRightVector(), Amount);
 }
+
+void ASTBaseCharacter::OnStartRunning()
+{
+    WantsToRun = true;
+}
+
+void ASTBaseCharacter::OnStopRunning()
+{
+    WantsToRun = false;
+}
+
+
+bool ASTBaseCharacter::IsRunning() const
+
+{
+    return WantsToRun && IsMovingForward && !GetVelocity().IsZero();
+}
+
